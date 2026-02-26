@@ -1,13 +1,12 @@
 package com.kong.jobnews.api;
 
 import com.kong.jobnews.dto.PostCreateRequest;
-import com.kong.jobnews.domain.Post;
-import com.kong.jobnews.repository.PostRepository;
+import com.kong.jobnews.dto.PostResponse;
+import com.kong.jobnews.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -15,20 +14,15 @@ import java.util.List;
 @RequestMapping("/api/posts")
 public class PostController {
 
-    private final PostRepository postRepository;
+    private final PostService postService;
 
     @PostMapping
-    public Post create(@RequestBody @Valid PostCreateRequest req) {
-        Post post = Post.builder()
-                .title(req.title())
-                .url(req.url())
-                .createdAt(LocalDateTime.now())
-                .build();
-        return postRepository.save(post);
+    public PostResponse create(@RequestBody @Valid PostCreateRequest req) {
+        return postService.create(req);
     }
 
     @GetMapping
-    public List<Post> list() {
-        return postRepository.findAll();
+    public List<PostResponse> list() {
+        return postService.list();
     }
 }
