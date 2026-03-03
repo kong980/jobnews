@@ -8,12 +8,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice   // 전역 예외 처리 클래스 : 모든 @RestController에서 발생하는 예외를 가로챔
 public class ApiExceptionHandler {
 
-    // @Valid 검증 실패 처리 : 400
+    // Validation 실패(400)
     @ResponseStatus(HttpStatus.BAD_REQUEST) // HTTP 상태코드를 400으로 설정, ResponseEntity 없이도 상태 코드 지정 가능
     @ExceptionHandler(MethodArgumentNotValidException.class) // @Valid 검증 실패 시 발생하는 예외
     public Map<String, Object> handleValidation(MethodArgumentNotValidException e){
@@ -31,9 +32,19 @@ public class ApiExceptionHandler {
         );
     }
 
-    @ResponseStatus(HttpStatus.CONFLICT)    // 409 상태코드 반환
-    @ExceptionHandler(IllegalArgumentException.class)   // 직접 던져놓은 예외(중복 등)
+    // 중복 등 비즈니스 예외(409)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(IllegalArgumentException.class)
     public Map<String, Object> handleIllegalArgumentException(IllegalArgumentException e){
+        return Map.of(
+                "message", e.getMessage()
+        );
+    }
+
+    // 단건 조회 실패(404)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(NoSuchElementException.class)
+    public Map<String, Object> handleNotFound(NoSuchElementException e){
         return Map.of(
                 "message", e.getMessage()
         );
