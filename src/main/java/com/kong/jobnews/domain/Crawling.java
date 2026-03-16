@@ -13,14 +13,24 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Post {
+public class Crawling {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String title;
+    private String company; // 회사명
 
-    private String url;
+    private String title;   // 공고 제목
 
-    private LocalDateTime createdAt;
+    private String experience;  // 경력
+
+    private String education;   // 학력
+
+    private String location;    // 지역
+
+    private String url; // 공고 상세 페이지 주소
+
+    private LocalDateTime createdAt;    // 공고 게시일
+
+    private LocalDateTime endAt;    // 공고 마감일
 }
