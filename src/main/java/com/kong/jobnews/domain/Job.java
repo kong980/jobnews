@@ -6,14 +6,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Crawling {
+public class Job {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,7 +30,7 @@ public class Crawling {
 
     private String url; // 공고 상세 페이지 주소
 
-    private LocalDateTime createdAt;    // 공고 게시일
+    private LocalDate createdAt;    // 공고 게시일
 
-    private LocalDateTime endAt;    // 공고 마감일
+    private LocalDate endAt;    // 공고 마감일
 }
