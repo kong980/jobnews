@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,7 +36,7 @@ public class JobService {
 
         List<Job> result = new ArrayList<>();
 
-        for (int i = 1; i <= 3; i++) {
+        for (int i = 1; i <= 5; i++) {
             Document doc = Jsoup.connect(url + page + i).get();
             Elements rows = doc.select("table#contentArea tbody tr");   // 채용 공고 목록 추출
 
@@ -62,11 +63,22 @@ public class JobService {
                 String education = specs.get(1).text();     // 학력
 
                 Elements dates = row.select(".pd24").last().select(".s1_r");    // 공고일 & 마감일
-                if (dates.size() < 2) {
+                LocalDate createdAt;
+                LocalDate endAt;
+
+                // 데이터가 없는 경우
+                if(dates.size() == 0){
                     continue;
                 }
-                LocalDate endAt = parseDate(dates.get(0).text());   // 마감일
-                LocalDate createdAt = parseDate(dates.get(1).text());   // 공고일
+                // 마감일이 따로 없이 '채용시까지'인 경우
+                else if (dates.size() == 1) {
+                    createdAt = parseDate(dates.get(0).text());
+                    endAt = createdAt.plusMonths(3);  // 공고 진행일에서 3달 추가
+                }
+                else{
+                    endAt = parseDate(dates.get(0).text());   // 마감일
+                    createdAt = parseDate(dates.get(1).text());   // 공고일
+                }
 
                 // 채용 공고 제목 추출을 위해 세부 페이지로 이동
                 Document site = Jsoup.connect(href).get();
@@ -101,7 +113,11 @@ public class JobService {
     }
 
     // 공고 전체 조회
-    public Page<Job> view(Pageable pageable) {
+    public Page<Job> view(Pageable pageable, JobDto jobDto) {
+        // 마감된 공고 데이터 삭제
+        LocalDate today = LocalDate.now();
+        jobRepository.deleteByEndAtBefore(today);
+
         return jobRepository.findAll(pageable);
     }
 }

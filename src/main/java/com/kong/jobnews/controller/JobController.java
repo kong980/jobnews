@@ -8,10 +8,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor    // final 필드를 대상으로 생성자를 자동 생성 --> 생성자 주입
@@ -24,8 +26,8 @@ public class JobController {
             2. CrawlingService에서 반환
      */
     @PostMapping("/crawling")
-    public List<JobDto> crawling() throws IOException {
-        return jobService.crawling();
+    public ResponseEntity<List<JobDto>> crawling() throws IOException {
+        return ResponseEntity.ok(jobService.crawling());
     }
 
     /*
@@ -33,9 +35,12 @@ public class JobController {
             1. 한 페이지에 10건씩
             2. 정렬 조건은 id
             3. 최신순으로 보기 위해 direction을 내림차순으로 설정(디폴트 : ASC)
+            4. 검색 필터를 위해 @RequestBody 추가
      */
     @GetMapping
-    public Page<Job> view(@PageableDefault(size=10, sort="id", direction = Sort.Direction.DESC) Pageable pageable) {
-        return jobService.view(pageable);
+    public ResponseEntity<Page<Job>> view(@PageableDefault(size=10, sort="id", direction = Sort.Direction.DESC) Pageable pageable
+    , @RequestBody JobDto jobDto) {
+        return ResponseEntity.ok(jobService.view(pageable, jobDto));
     }
 }
+
